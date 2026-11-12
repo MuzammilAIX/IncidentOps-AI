@@ -1,0 +1,55 @@
+
+# ==========================================
+# IncidentOps-AI - Python Dependencies
+# ==========================================
+
+# Django & REST API
+Django
+djangorestframework
+django-cors-headers
+django-filter
+
+# Environment & Configuration
+python-decouple
+python-dotenv
+
+# Database
+psycopg[binary]
+
+# Background Processing
+celery[redis]
+redis
+
+# AI & Agent Orchestration
+langchain
+langgraph
+langchain-openai
+langchain-community
+pydantic
+
+# Infrastructure Integrations
+docker
+prometheus-client
+boto3
+
+# HTTP & API Communication
+requests
+httpx
+
+# Data Validation
+pydantic-settings
+
+# Logging & Monitoring
+structlog
+
+# Security
+cryptography
+
+# Testing
+pytest
+pytest-django
+pytest-cov
+factory-boy
+
+# Code Quality
+ruff

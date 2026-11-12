@@ -1,0 +1,11 @@
+﻿from django.contrib import admin
+from .models import Incident
+
+
+@admin.register(Incident)
+class IncidentAdmin(admin.ModelAdmin):
+    list_display = ("id", "title", "severity", "status", "service", "created_at")
+    list_filter = ("severity", "status")
+    search_fields = ("title", "description")
+    list_select_related = ("service",)
+    date_hierarchy = "created_at"
