@@ -21,16 +21,25 @@
       return;
     }
 
-    // Reset state
     errorBox.classList.remove('visible');
     btn.disabled = true;
     btn.textContent = 'Signing in...';
 
     try {
-      const user = await api.login(username, password);
-      console.log('Login successful:', user);
+      await api.login(username, password);
 
-      // Redirect to ?next= or dashboard
+      // CRITICAL: wait for Set-Cookie to be committed by the browser
+      await new Promise(r => setTimeout(r, 300));
+
+      // Verify the session actually works before navigating
+      try {
+        await api.me();
+      } catch (probeErr) {
+        // Session didn't stick — retry once more after a longer wait
+        await new Promise(r => setTimeout(r, 500));
+        await api.me();
+      }
+
       const params = new URLSearchParams(window.location.search);
       const next = params.get('next') || '/';
       window.location.href = next;

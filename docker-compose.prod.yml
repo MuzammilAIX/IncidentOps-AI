@@ -1,9 +1,4 @@
-﻿# ═══════════════════════════════════════════════════════════
-# IncidentOps-AI — Production Docker Compose
-# ═══════════════════════════════════════════════════════════
-
-services:
-  # ─── Database ─────────────────────────────────────────────
+﻿services:
   db:
     image: postgres:16
     restart: unless-stopped
@@ -19,7 +14,6 @@ services:
       timeout: 5s
       retries: 10
 
-  # ─── Redis ────────────────────────────────────────────────
   redis:
     image: redis:7
     restart: unless-stopped
@@ -31,21 +25,23 @@ services:
       timeout: 3s
       retries: 10
 
-  # ─── Django (Gunicorn) ────────────────────────────────────
   web:
     build:
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
-    command: >
-      sh -c "python manage.py migrate --noinput &&
-             python manage.py collectstatic --noinput &&
-             gunicorn config.wsgi:application
-               --bind 0.0.0.0:8000
-               --workers 3
-               --timeout 120
-               --access-logfile -
-               --error-logfile -"
+    command:
+      - sh
+      - -c
+      - |
+        python manage.py migrate --noinput
+        python manage.py collectstatic --noinput
+        exec gunicorn config.wsgi:application \
+          --bind 0.0.0.0:8000 \
+          --workers 3 \
+          --timeout 120 \
+          --access-logfile - \
+          --error-logfile -
     volumes:
       - staticfiles:/app/staticfiles
     ports:
@@ -60,7 +56,6 @@ services:
     environment:
       DJANGO_SETTINGS_MODULE: config.settings.production
 
-  # ─── Celery Worker ────────────────────────────────────────
   worker:
     build:
       context: .
@@ -77,7 +72,6 @@ services:
     environment:
       DJANGO_SETTINGS_MODULE: config.settings.production
 
-  # ─── Celery Beat (scheduler) ──────────────────────────────
   beat:
     build:
       context: .
@@ -94,7 +88,6 @@ services:
     environment:
       DJANGO_SETTINGS_MODULE: config.settings.production
 
-  # ─── Nginx (serves frontend + proxies API) ────────────────
   nginx:
     image: nginx:alpine
     restart: unless-stopped

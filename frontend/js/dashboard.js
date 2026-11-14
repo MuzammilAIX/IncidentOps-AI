@@ -1,6 +1,12 @@
 ﻿/* IncidentOps-AI Dashboard */
 
 (function() {
+  function redirectToLogin() {
+    if (!window.location.pathname.startsWith('/login/')) {
+      window.location.href = '/login/?next=' + encodeURIComponent(window.location.pathname);
+    }
+  }
+
   async function init() {
     try {
       const user = await api.me();
@@ -9,6 +15,7 @@
         escapeHtml(user.username) + '</div>' +
         '<div style="font-size:11px;color:var(--text-muted)">Signed in</div>';
     } catch (e) {
+      if (e.status === 401 || e.status === 403) { redirectToLogin(); return; }
       console.warn('Not authenticated:', e);
       return;
     }
@@ -27,6 +34,7 @@
       document.getElementById('last-updated').textContent =
         'Updated ' + new Date().toLocaleTimeString();
     } catch (e) {
+      if (e.status === 401 || e.status === 403) { redirectToLogin(); return; }
       console.error('Refresh failed:', e);
     }
   }
@@ -43,6 +51,7 @@
       document.getElementById('stat-pending').textContent = pending.count || 0;
       document.getElementById('stat-investigating').textContent = '-';
     } catch (e) {
+      if (e.status === 401 || e.status === 403) throw e;
       console.error('Stats failed:', e);
     }
   }
@@ -58,6 +67,7 @@
       }
       container.innerHTML = data.results.map(renderIncidentCard).join('');
     } catch (e) {
+      if (e.status === 401 || e.status === 403) throw e;
       console.error('Incidents failed:', e);
       container.innerHTML = '<div class="empty-state"><div class="empty-state-title">Failed to load</div></div>';
     }
@@ -82,6 +92,7 @@
           '</div>';
       }).join('');
     } catch (e) {
+      if (e.status === 401 || e.status === 403) throw e;
       console.error('Approvals failed:', e);
     }
   }

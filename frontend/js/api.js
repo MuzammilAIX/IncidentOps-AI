@@ -12,19 +12,21 @@ const api = {
     options.credentials = 'include';
     options.headers = options.headers || {};
 
+    // Always attach CSRF (safe for GET too)
+    const csrf = getCookie('csrftoken');
+    if (csrf) options.headers['X-CSRFToken'] = csrf;
+
     if (options.method && options.method !== 'GET') {
       options.headers['Content-Type'] = 'application/json';
-      const csrf = getCookie('csrftoken');
-      if (csrf) options.headers['X-CSRFToken'] = csrf;
     }
 
     const response = await fetch(url, options);
 
     if (response.status === 401 || response.status === 403) {
-      if (!window.location.pathname.startsWith('/login/')) {
-        window.location.href = '/login/?next=' + encodeURIComponent(window.location.pathname);
-      }
-      throw new Error('Not authenticated');
+      // Do NOT redirect here. Throw and let the page decide.
+      const err = new Error('Not authenticated');
+      err.status = response.status;
+      throw err;
     }
 
     if (!response.ok) {
@@ -36,80 +38,36 @@ const api = {
     return response.json();
   },
 
-  async get(url) {
-    return this._fetch(url, { method: 'GET' });
-  },
+  async get(url) { return this._fetch(url, { method: 'GET' }); },
+  async post(url, data) { return this._fetch(url, { method: 'POST', body: JSON.stringify(data) }); },
+  async patch(url, data) { return this._fetch(url, { method: 'PATCH', body: JSON.stringify(data) }); },
+  async delete(url) { return this._fetch(url, { method: 'DELETE' }); },
 
-  async post(url, data) {
-    return this._fetch(url, { method: 'POST', body: JSON.stringify(data) });
-  },
+  async login(username, password) { return this.post('/api/auth/login/', { username, password }); },
+  async logout() { return this.post('/api/auth/logout/', {}); },
+  async me() { return this.get('/api/auth/me/'); },
 
-  async patch(url, data) {
-    return this._fetch(url, { method: 'PATCH', body: JSON.stringify(data) });
-  },
-
-  async delete(url) {
-    return this._fetch(url, { method: 'DELETE' });
-  },
-
-  // ─── Auth ──────────────────────────────
-  async login(username, password) {
-    return this.post('/api/auth/login/', { username, password });
-  },
-
-  async logout() {
-    return this.post('/api/auth/logout/', {});
-  },
-
-  async me() {
-    return this.get('/api/auth/me/');
-  },
-
-  // ─── Incidents ─────────────────────────
   async getIncidents(params = {}) {
     const qs = new URLSearchParams(params).toString();
     return this.get('/api/incidents/' + (qs ? '?' + qs : ''));
   },
+  async getIncident(id) { return this.get('/api/incidents/' + id + '/'); },
+  async createIncident(data) { return this.post('/api/incidents/', data); },
+  async updateIncident(id, data) { return this.patch('/api/incidents/' + id + '/', data); },
 
-  async getIncident(id) {
-    return this.get('/api/incidents/' + id + '/');
-  },
-
-  async createIncident(data) {
-    return this.post('/api/incidents/', data);
-  },
-
-  async updateIncident(id, data) {
-    return this.patch('/api/incidents/' + id + '/', data);
-  },
-
-  // ─── Investigations ────────────────────
   async getInvestigations(params = {}) {
     const qs = new URLSearchParams(params).toString();
     return this.get('/api/investigations/' + (qs ? '?' + qs : ''));
   },
+  async getInvestigation(id) { return this.get('/api/investigations/' + id + '/'); },
 
-  async getInvestigation(id) {
-    return this.get('/api/investigations/' + id + '/');
-  },
-
-  // ─── Approvals ─────────────────────────
   async getApprovals(params = {}) {
     const qs = new URLSearchParams(params).toString();
     return this.get('/api/approvals/' + (qs ? '?' + qs : ''));
   },
-
-  async getApproval(id) {
-    return this.get('/api/approvals/' + id + '/');
-  },
-
-  async approveApproval(id) {
-    return this.post('/api/approvals/' + id + '/approve/', {});
-  },
-
-  async rejectApproval(id) {
-    return this.post('/api/approvals/' + id + '/reject/', {});
-  },
+  async getApproval(id) { return this.get('/api/approvals/' + id + '/'); },
+  async approveApproval(id) { return this.post('/api/approvals/' + id + '/approve/', {}); },
+  async rejectApproval(id) { return this.post('/api/approvals/' + id + '/reject/', {}); },
 };
 
 window.api = api;
