@@ -20,7 +20,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Third-party
     "rest_framework",
-    "django_filters",                      # ← ADDED — required for filter form templates
+    "django_filters",
     # Local apps
     "apps.accounts",
     "apps.teams",
@@ -47,7 +47,7 @@ ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [{
     "BACKEND": "django.template.backends.django.DjangoTemplates",
-    "DIRS": [],
+    "DIRS": [BASE_DIR / "frontend"],
     "APP_DIRS": True,
     "OPTIONS": {"context_processors": [
         "django.template.context_processors.debug",
@@ -67,7 +67,7 @@ DATABASES = {
         "USER": os.getenv("DB_USER", "postgres"),
         "PASSWORD": os.getenv("DB_PASSWORD", "postgres"),
         "HOST": os.getenv("DB_HOST", "localhost"),
-        "PORT": os.getenv("DB_PORT", "5433"),   # ← FIXED: was 5432, now 5433 to match Docker
+        "PORT": os.getenv("DB_PORT", "5433"),
     }
 }
 
@@ -80,6 +80,13 @@ USE_I18N = True
 USE_TZ = True
 STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# ─── FRONTEND STATIC FILES ─────────────────────────────────────
+# Serve frontend/css/*.css and frontend/js/*.js via /static/
+STATICFILES_DIRS = [
+    BASE_DIR / "frontend",
+]
+# ───────────────────────────────────────────────────────────────
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
