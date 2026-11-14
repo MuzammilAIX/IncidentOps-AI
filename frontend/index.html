@@ -1,1 +1,101 @@
-﻿<!DOCTYPE html><html><head><title>Dashboard</title></head><body><h1>Dashboard coming soon</h1></body></html>
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — IncidentOps-AI</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">🚨</div>
+        <span>IncidentOps-AI</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/" class="nav-item active">
+          <span class="nav-item-icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="/incidents/" class="nav-item">
+          <span class="nav-item-icon">🚨</span>
+          <span>Incidents</span>
+        </a>
+        <a href="/approvals/" class="nav-item">
+          <span class="nav-item-icon">✅</span>
+          <span>Approvals</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div id="user-info" style="margin-bottom:8px">Loading...</div>
+        <button class="btn btn-ghost btn-sm" id="logout-btn" style="width:100%">Sign Out</button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-wrapper">
+      <header class="header">
+        <h1 class="header-title">Dashboard</h1>
+        <div class="header-actions">
+          <span id="last-updated" style="font-size:12px;color:var(--text-muted)">Loading...</span>
+        </div>
+      </header>
+
+      <main class="main">
+        <!-- STATS -->
+        <div class="card-grid" id="stats">
+          <div class="stat-card">
+            <div class="stat-label">Active Incidents</div>
+            <div class="stat-value" id="stat-active">—</div>
+            <div class="stat-trend" id="stat-active-trend"></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Investigating</div>
+            <div class="stat-value" id="stat-investigating">—</div>
+            <div class="stat-trend" id="stat-investigating-trend"></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Pending Approvals</div>
+            <div class="stat-value" id="stat-pending">—</div>
+            <div class="stat-trend" id="stat-pending-trend"></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Incidents</div>
+            <div class="stat-value" id="stat-total">—</div>
+            <div class="stat-trend">All time</div>
+          </div>
+        </div>
+
+        <!-- TWO COLUMN LAYOUT -->
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Recent Incidents</h2>
+              <a href="/incidents/" class="btn btn-ghost btn-sm">View all →</a>
+            </div>
+            <div id="incidents-list" class="incident-list">
+              <div class="loading-overlay"><span class="spinner"></span> Loading incidents...</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Pending Approvals</h2>
+              <a href="/approvals/" class="btn btn-ghost btn-sm">View all →</a>
+            </div>
+            <div id="approvals-list">
+              <div class="loading-overlay"><span class="spinner"></span> Loading approvals...</div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/utils.js"></script>
+  <script src="/static/js/dashboard.js"></script>
+</body>
+</html>
