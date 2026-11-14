@@ -1,1 +1,54 @@
-﻿<!DOCTYPE html><html><head><title>Incident</title></head><body><h1>Incident detail coming soon</h1></body></html>
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Incident Detail - IncidentOps-AI</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">🚨</div>
+        <span>IncidentOps-AI</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/" class="nav-item">
+          <span class="nav-item-icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="/incidents/" class="nav-item active">
+          <span class="nav-item-icon">🚨</span>
+          <span>Incidents</span>
+        </a>
+        <a href="/approvals/" class="nav-item">
+          <span class="nav-item-icon">✅</span>
+          <span>Approvals</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div id="user-info">Loading...</div>
+        <button class="btn btn-ghost btn-sm" id="logout-btn" style="width:100%;margin-top:8px">Sign Out</button>
+      </div>
+    </aside>
+    <div class="main-wrapper">
+      <header class="header">
+        <div style="display:flex;align-items:center;gap:16px">
+          <a href="/incidents/" style="color:var(--text-muted);font-size:14px">← Back to Incidents</a>
+          <h1 class="header-title" id="incident-title">Loading...</h1>
+        </div>
+        <div class="header-actions">
+          <span id="last-updated" style="font-size:12px;color:var(--text-muted)"></span>
+        </div>
+      </header>
+      <main class="main" id="main-content">
+        <div class="loading-overlay"><span class="spinner"></span> Loading incident...</div>
+      </main>
+    </div>
+  </div>
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/utils.js"></script>
+  <script src="/static/js/incident.js"></script>
+</body>
+</html>
