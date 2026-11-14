@@ -1,11 +1,46 @@
-
+﻿# Python
 __pycache__/
 *.py[cod]
 .venv/
+venv/
+
+# Environment
 .env
+.env.local
+.env.*.local
+
+# Database
 db.sqlite3
-.idea/
-.vscode/
-.DS_Store
+*.sqlite3
+
+# Django
+staticfiles/
+media/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
 test_*.py
-create_inv.py
+create_structure.py
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Node
+node_modules/
+
+# UV
+uv.lock
+.env
