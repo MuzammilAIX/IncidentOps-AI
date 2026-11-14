@@ -1,0 +1,52 @@
+﻿/* IncidentOps-AI — Login page logic */
+
+(function() {
+  const form = document.getElementById('login-form');
+  const errorBox = document.getElementById('login-error');
+  const btn = document.getElementById('login-btn');
+
+  if (!form) {
+    console.warn('Login form not found');
+    return;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+
+    if (!username || !password) {
+      showError('Please enter username and password');
+      return;
+    }
+
+    // Reset state
+    errorBox.classList.remove('visible');
+    btn.disabled = true;
+    btn.textContent = 'Signing in...';
+
+    try {
+      const user = await api.login(username, password);
+      console.log('Login successful:', user);
+
+      // Redirect to ?next= or dashboard
+      const params = new URLSearchParams(window.location.search);
+      const next = params.get('next') || '/';
+      window.location.href = next;
+
+    } catch (err) {
+      console.error('Login error:', err);
+      showError('Invalid username or password');
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+      document.getElementById('password').value = '';
+      document.getElementById('password').focus();
+    }
+  });
+
+  function showError(message) {
+    errorBox.textContent = message;
+    errorBox.classList.add('visible');
+  }
+})();
