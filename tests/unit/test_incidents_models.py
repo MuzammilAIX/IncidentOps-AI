@@ -1,5 +1,6 @@
 ﻿"""Unit tests for Incident model."""
 import pytest
+from datetime import timedelta
 from django.utils import timezone
 
 from apps.incidents.models import Incident
@@ -46,7 +47,12 @@ class TestIncidentModel:
 
     def test_ordering_newest_first(self, service):
         inc1 = Incident.objects.create(title="First", severity="high", service=service)
+        # Force inc1 to be 5 seconds older for deterministic ordering
+        inc1.created_at = timezone.now() - timedelta(seconds=5)
+        inc1.save(update_fields=["created_at"])
+
         inc2 = Incident.objects.create(title="Second", severity="high", service=service)
+
         incidents = Incident.objects.all().order_by("-created_at")
         assert incidents[0].id == inc2.id
         assert incidents[1].id == inc1.id
