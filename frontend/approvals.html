@@ -1,1 +1,59 @@
-﻿<!DOCTYPE html><html><head><title>Approvals</title></head><body><h1>Approvals coming soon</h1></body></html>
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Approvals - IncidentOps-AI</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">🚨</div>
+        <span>IncidentOps-AI</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/" class="nav-item">
+          <span class="nav-item-icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="/incidents/" class="nav-item">
+          <span class="nav-item-icon">🚨</span>
+          <span>Incidents</span>
+        </a>
+        <a href="/approvals/" class="nav-item active">
+          <span class="nav-item-icon">✅</span>
+          <span>Approvals</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div id="user-info">Loading...</div>
+        <button class="btn btn-ghost btn-sm" id="logout-btn" style="width:100%;margin-top:8px">Sign Out</button>
+      </div>
+    </aside>
+    <div class="main-wrapper">
+      <header class="header">
+        <h1 class="header-title">Approvals</h1>
+        <div class="header-actions">
+          <select class="form-select" id="filter-status" style="width:auto;padding:6px 10px">
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+            <option value="">All</option>
+          </select>
+          <span id="result-count" style="font-size:13px;color:var(--text-muted)"></span>
+        </div>
+      </header>
+      <main class="main">
+        <div id="approvals-container">
+          <div class="loading-overlay"><span class="spinner"></span> Loading approvals...</div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/utils.js"></script>
+  <script src="/static/js/approvals.js"></script>
+</body>
+</html>
