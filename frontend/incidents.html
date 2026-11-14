@@ -1,1 +1,85 @@
-﻿<!DOCTYPE html><html><head><title>Incidents</title></head><body><h1>Incidents coming soon</h1></body></html>
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Incidents - IncidentOps-AI</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">🚨</div>
+        <span>IncidentOps-AI</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/" class="nav-item">
+          <span class="nav-item-icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="/incidents/" class="nav-item active">
+          <span class="nav-item-icon">🚨</span>
+          <span>Incidents</span>
+        </a>
+        <a href="/approvals/" class="nav-item">
+          <span class="nav-item-icon">✅</span>
+          <span>Approvals</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div id="user-info">Loading...</div>
+        <button class="btn btn-ghost btn-sm" id="logout-btn" style="width:100%;margin-top:8px">Sign Out</button>
+      </div>
+    </aside>
+    <div class="main-wrapper">
+      <header class="header">
+        <h1 class="header-title">Incidents</h1>
+        <div class="header-actions">
+          <span id="result-count" style="font-size:13px;color:var(--text-muted)"></span>
+        </div>
+      </header>
+      <main class="main">
+        <div class="card" style="margin-bottom:16px">
+          <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+            <div class="form-group" style="margin:0;min-width:180px">
+              <label class="form-label" style="margin-bottom:4px">Search</label>
+              <input type="text" class="form-input" id="filter-search" placeholder="Search title...">
+            </div>
+            <div class="form-group" style="margin:0;min-width:150px">
+              <label class="form-label" style="margin-bottom:4px">Severity</label>
+              <select class="form-select" id="filter-severity">
+                <option value="">All</option>
+                <option value="critical">Critical</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin:0;min-width:150px">
+              <label class="form-label" style="margin-bottom:4px">Status</label>
+              <select class="form-select" id="filter-status">
+                <option value="">All</option>
+                <option value="open">Open</option>
+                <option value="investigating">Investigating</option>
+                <option value="resolved">Resolved</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin:0">
+              <label class="form-label" style="margin-bottom:4px">&nbsp;</label>
+              <button class="btn btn-ghost" id="clear-filters">Clear</button>
+            </div>
+          </div>
+        </div>
+        <div id="incidents-container" class="incident-list">
+          <div class="loading-overlay"><span class="spinner"></span> Loading incidents...</div>
+        </div>
+        <div id="pagination" style="display:flex;justify-content:center;gap:8px;margin-top:16px"></div>
+      </main>
+    </div>
+  </div>
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/utils.js"></script>
+  <script src="/static/js/incidents.js"></script>
+</body>
+</html>
