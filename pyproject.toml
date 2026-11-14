@@ -25,6 +25,8 @@ dependencies = [
     # ── Production server ────────────────────────
     "gunicorn>=21.2,<22.0",
     "django-filter>=26.2",
+    "openai>=1.109.1",
+    "pgvector>=0.5.1",
 ]
 
 [project.optional-dependencies]

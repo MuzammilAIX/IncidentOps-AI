@@ -1,5 +1,4 @@
-
-"""AI safety rules — block dangerous actions."""
+ï»¿"""AI safety rules - block dangerous actions."""
 
 FORBIDDEN_ACTIONS = {
     "delete_database",
