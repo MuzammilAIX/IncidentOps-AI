@@ -1,6 +1,6 @@
-"""Monitoring views - webhook endpoints + health check + anomaly list."""
+﻿"""Monitoring views - webhook endpoints + health check + anomaly list."""
 from django.core.cache import cache
-from django.db import connection
+from django.db import connection, models
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
@@ -82,7 +82,7 @@ class LLMCallViewSet(viewsets.ReadOnlyModelViewSet):
     ordering = ["-created_at"]
 
 class RunbookViewSet(viewsets.ReadOnlyModelViewSet):
-    """Read-only API for team runbooks — searchable, browsable."""
+    """Read-only API for team runbooks â€” searchable, browsable."""
     from .models import Runbook
     from .serializers import RunbookSerializer
     queryset = Runbook.objects.all()

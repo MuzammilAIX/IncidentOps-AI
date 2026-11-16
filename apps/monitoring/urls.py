@@ -1,7 +1,8 @@
-from django.urls import path, include
+﻿from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from .views import (
+    RunbookViewSet,
     prometheus_webhook,
     grafana_webhook,
     generic_webhook,
@@ -15,6 +16,7 @@ router = DefaultRouter()
 router.register(r"anomalies", AnomalyViewSet, basename="anomaly")
 router.register(r"alerts", AlertViewSet, basename="alert")
 router.register(r"llm-calls", LLMCallViewSet, basename="llm-call")
+router.register(r"runbooks", RunbookViewSet, basename="runbook")
 
 urlpatterns = [
     path("health/", health, name="health"),

@@ -19,6 +19,7 @@ urlpatterns = [
     # Frontend pages (auth handled client-side via api.me())
     path("", TemplateView.as_view(template_name="index.html"), name="dashboard"),
     path("incidents/", TemplateView.as_view(template_name="incidents.html"), name="incidents"),
+    path("runbooks/", TemplateView.as_view(template_name="runbooks.html"), name="runbooks"),
     path("incident/", TemplateView.as_view(template_name="incident.html"), name="incident"),
     path("approvals/", TemplateView.as_view(template_name="approvals.html"), name="approvals"),
 ]

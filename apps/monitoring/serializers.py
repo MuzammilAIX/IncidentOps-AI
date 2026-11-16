@@ -47,3 +47,13 @@ class LLMCallSerializer(serializers.ModelSerializer):
             "latency_ms", "success", "error_message",
             "estimated_cost_usd", "created_at",
         ]
+
+
+class RunbookSerializer(serializers.ModelSerializer):
+    class Meta:
+        from .models import Runbook
+        model = Runbook
+        fields = [
+            "id", "code", "title", "category", "content",
+            "keywords", "service_hint", "created_at", "updated_at",
+        ]
