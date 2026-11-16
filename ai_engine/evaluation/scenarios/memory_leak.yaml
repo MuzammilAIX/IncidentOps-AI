@@ -1,2 +1,11 @@
-name: memory_leak
+﻿name: memory_leak
+description: "Notification worker memory grows unbounded then crashes"
 expected_root_cause: memory_leak
+service: notification-worker
+severity: high
+diagnostics:
+  status:
+    state: running
+    memory_percent: 94.5
+    memory_growth_mb_per_min: 12.3
+    restart_count_24h: 3

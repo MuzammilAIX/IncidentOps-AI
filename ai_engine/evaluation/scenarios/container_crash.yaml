@@ -1,2 +1,13 @@
-name: container_crash
+﻿name: container_crash
+description: "Payment API container OOM-killed during high traffic"
 expected_root_cause: container_oom_killed
+service: payment-service
+severity: critical
+diagnostics:
+  status:
+    state: exited
+    oom_killed: true
+    exit_code: 137
+    logs:
+      - "FATAL: Out of memory"
+      - "OOMKilled"

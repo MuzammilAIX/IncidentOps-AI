@@ -1,2 +1,11 @@
-name: high_cpu
+﻿name: high_cpu
+description: "Auth service CPU saturation causing latency spike"
 expected_root_cause: cpu_saturation
+service: auth-service
+severity: high
+diagnostics:
+  status:
+    state: running
+    cpu_percent: 99.2
+    throttled: true
+    latency_p99_ms: 2100
