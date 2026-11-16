@@ -1,4 +1,4 @@
-﻿"""Monitoring views - webhook endpoints + health check + anomaly list."""
+"""Monitoring views - webhook endpoints + health check + anomaly list."""
 from django.core.cache import cache
 from django.db import connection
 from rest_framework import permissions, status, viewsets
@@ -6,13 +6,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from .models import Anomaly, Alert
-from .serializers import AnomalySerializer, AlertSerializer
+from .models import Anomaly, Alert, LLMCall
+from .serializers import AnomalySerializer, AlertSerializer, LLMCallSerializer
 
-
-# ═══════════════════════════════════════════════════════════
-# Webhooks (for Prometheus, Grafana, generic alert ingestion)
-# ═══════════════════════════════════════════════════════════
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
@@ -38,58 +34,49 @@ def generic_webhook(request):
     return Response({"ingested": count}, status=status.HTTP_201_CREATED)
 
 
-# ═══════════════════════════════════════════════════════════
-# Health check (for load balancers, uptime monitors, k8s)
-# ═══════════════════════════════════════════════════════════
-
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def health(request):
-    """Health check endpoint. Returns 200 if healthy, 503 if any dependency fails."""
-    checks = {}
-    status_code = 200
-
-    # Database
+    """Health check endpoint."""
+    db_ok = False
+    cache_ok = False
     try:
         with connection.cursor() as cursor:
             cursor.execute("SELECT 1")
-            checks["database"] = "ok"
-    except Exception as e:
-        checks["database"] = "error: " + str(e)
-        status_code = 503
-
-    # Redis (via Django cache)
+        db_ok = True
+    except Exception:
+        pass
     try:
-        cache.set("_health_check", "ok", 5)
-        if cache.get("_health_check") == "ok":
-            checks["cache"] = "ok"
-        else:
-            checks["cache"] = "error: read mismatch"
-            status_code = 503
-    except Exception as e:
-        checks["cache"] = "error: " + str(e)
-        status_code = 503
-
-    return Response(
-        {
-            "status": "healthy" if status_code == 200 else "unhealthy",
-            "checks": checks,
-        },
-        status=status_code,
-    )
+        cache.set("health_check", "ok", 5)
+        cache_ok = cache.get("health_check") == "ok"
+    except Exception:
+        pass
+    return Response({
+        "status": "healthy" if (db_ok and cache_ok) else "degraded",
+        "checks": {"database": "ok" if db_ok else "fail", "cache": "ok" if cache_ok else "fail"},
+    })
 
 
-# ═══════════════════════════════════════════════════════════
-# ViewSets (Anomalies, Alerts)
-# ═══════════════════════════════════════════════════════════
-
-class AnomalyViewSet(viewsets.ReadOnlyModelViewSet):
+class AnomalyViewSet(viewsets.ModelViewSet):
     queryset = Anomaly.objects.select_related("service", "incident").all()
     serializer_class = AnomalySerializer
     permission_classes = [permissions.IsAuthenticated]
+    filterset_fields = ["service", "severity", "anomaly_type"]
+    ordering = ["-created_at"]
 
 
-class AlertViewSet(viewsets.ReadOnlyModelViewSet):
+class AlertViewSet(viewsets.ModelViewSet):
     queryset = Alert.objects.select_related("service").all()
     serializer_class = AlertSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filterset_fields = ["service", "severity", "firing"]
+    ordering = ["-created_at"]
+
+
+class LLMCallViewSet(viewsets.ReadOnlyModelViewSet):
+    """Read-only LLM call log for observability."""
+    queryset = LLMCall.objects.select_related("investigation").all()
+    serializer_class = LLMCallSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filterset_fields = ["investigation", "agent_name", "success"]
+    ordering = ["-created_at"]

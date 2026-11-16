@@ -113,3 +113,46 @@ class Runbook(models.Model):
 
     def __str__(self):
         return f"{self.code} — {self.title}"
+
+
+class LLMCall(models.Model):
+    """One LLM API call — observability, cost tracking, latency analysis."""
+    AGENT_CHOICES = [
+        ("triage", "Triage Agent"),
+        ("diagnosis", "Diagnosis Agent"),
+        ("remediation", "Remediation Agent"),
+        ("verifier", "Verifier Agent"),
+        ("other", "Other"),
+    ]
+
+    investigation = models.ForeignKey(
+        "investigations.Investigation",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="llm_calls",
+    )
+    agent_name = models.CharField(max_length=32, choices=AGENT_CHOICES, default="other")
+    model = models.CharField(max_length=64)
+    prompt_tokens = models.IntegerField(default=0)
+    completion_tokens = models.IntegerField(default=0)
+    total_tokens = models.IntegerField(default=0)
+    latency_ms = models.IntegerField(default=0)
+    success = models.BooleanField(default=True)
+    error_message = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["investigation", "-created_at"]),
+        ]
+
+    def __str__(self):
+        return f"{self.agent_name} ({self.total_tokens} tokens, {self.latency_ms}ms)"
+
+    @property
+    def estimated_cost_usd(self):
+        prompt_cost = (self.prompt_tokens / 1_000_000) * 0.15
+        completion_cost = (self.completion_tokens / 1_000_000) * 0.60
+        return round(prompt_cost + completion_cost, 6)

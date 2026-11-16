@@ -13,7 +13,7 @@ def diagnose(incident, triage_result: TriageResult, diagnostics: dict) -> Diagno
         return _rule_based_diagnosis(incident, triage_result, diagnostics)
 
     prompt = build_diagnosis_prompt(incident, triage_result, diagnostics)
-    result = call_llm(DIAGNOSIS_SYSTEM, prompt, DiagnosisResult, temperature=0.1)
+    result = call_llm(DIAGNOSIS_SYSTEM, prompt, DiagnosisResult, temperature=0.1, agent_name="diagnosis")
     if result is None:
         return _rule_based_diagnosis(incident, triage_result, diagnostics)
     return result
@@ -61,3 +61,4 @@ def _rule_based_diagnosis(incident, triage_result, diagnostics) -> DiagnosisResu
             confidence=0.3,
             reasoning=f"Container state is '{container_state}', no clear failure signal",
         )
+

@@ -33,3 +33,17 @@ class WatcherConfigSerializer(serializers.ModelSerializer):
     class Meta:
         model = WatcherConfig
         fields = ["id", "watcher_type", "enabled", "interval_seconds", "config", "last_run", "updated_at"]
+
+
+class LLMCallSerializer(serializers.ModelSerializer):
+    estimated_cost_usd = serializers.FloatField(read_only=True)
+
+    class Meta:
+        from .models import LLMCall
+        model = LLMCall
+        fields = [
+            "id", "investigation", "agent_name", "model",
+            "prompt_tokens", "completion_tokens", "total_tokens",
+            "latency_ms", "success", "error_message",
+            "estimated_cost_usd", "created_at",
+        ]

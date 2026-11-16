@@ -13,7 +13,7 @@ def triage(incident, alert: dict) -> TriageResult:
     prompt += chr(10) + "Alert: " + str(alert)
     prompt += chr(10) + chr(10) + "Triage this incident."
 
-    result = call_llm(TRIAGE_SYSTEM, prompt, TriageResult)
+    result = call_llm(TRIAGE_SYSTEM, prompt, TriageResult, agent_name="triage")
     if result is None:
         return _rule_based_triage(incident, alert)
     return result
@@ -48,3 +48,4 @@ def _rule_based_triage(incident, alert: dict) -> TriageResult:
         initial_hypotheses=hypotheses,
         urgency="immediate" if severity == "P1" else "soon",
     )
+

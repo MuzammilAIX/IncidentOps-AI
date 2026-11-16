@@ -1,4 +1,4 @@
-﻿/* IncidentOps-AI - Incident Detail Page */
+/* IncidentOps-AI - Incident Detail Page */
 
 (function() {
   let incidentId = null;
@@ -31,15 +31,18 @@
       const investigation = investigations.results && investigations.results[0];
       let approval = null;
       let runbooks = [];
+      let llmCalls = [];
       if (investigation) {
-        const [approvalsResp, runbooksResp] = await Promise.all([
+        const [approvalsResp, runbooksResp, llmResp] = await Promise.all([
           api.getApprovals({ investigation: investigation.id }).catch(() => ({ results: [] })),
           fetch('/api/investigations/' + investigation.id + '/runbooks/', { credentials: 'include' }).then(r => r.ok ? r.json() : { runbooks: [] }).catch(() => ({ runbooks: [] })),
+          fetch('/api/monitoring/llm-calls/?investigation=' + investigation.id, { credentials: 'include' }).then(r => r.ok ? r.json() : { results: [] }).catch(() => ({ results: [] })),
         ]);
         approval = approvalsResp.results && approvalsResp.results[0];
         runbooks = runbooksResp.runbooks || [];
+        llmCalls = llmResp.results || [];
       }
-      render(incident, investigation, approval, runbooks);
+      render(incident, investigation, approval, runbooks, llmCalls);
       document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
     } catch (e) {
       console.error('Load failed:', e);
@@ -47,10 +50,12 @@
     }
   }
 
-  function render(incident, investigation, approval, runbooks) {
+  function render(incident, investigation, approval, runbooks, llmCalls) {
     document.getElementById('incident-title').textContent = 'Incident #' + incident.id;
     let html = '';
+    // Incident header
     html += '<div class="card" style="margin-bottom:16px"><h2 style="font-size:20px;margin-bottom:8px">' + escapeHtml(incident.title) + '</h2><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">' + severityBadge(incident.severity) + statusBadge(incident.status) + (incident.service_name ? '<span class="badge" style="background:var(--bg-elevated);color:var(--text-secondary)">' + escapeHtml(incident.service_name) + '</span>' : '') + '</div><div style="font-size:13px;color:var(--text-muted)">Created ' + timeAgo(incident.created_at) + '</div>' + (incident.description ? '<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);color:var(--text-secondary)">' + escapeHtml(incident.description) + '</div>' : '') + '</div>';
+    // Runbooks card
     if (runbooks && runbooks.length > 0) {
       html += '<div class="card" style="margin-bottom:16px;border-left:4px solid var(--accent)"><div class="card-header"><h2 class="card-title">📖 Matched Runbooks (' + runbooks.length + ')</h2><span class="badge" style="background:var(--accent-bg);color:var(--accent-hover)">Knowledge Base</span></div><div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">These runbooks from your team knowledge base match this incident. The AI agent consulted them during diagnosis.</div>';
       runbooks.forEach(function(rb) {
@@ -58,6 +63,23 @@
       });
       html += '</div>';
     }
+    // LLM Trace card
+    if (llmCalls && llmCalls.length > 0) {
+      var totalTokens = 0, totalLatency = 0, totalCost = 0;
+      llmCalls.forEach(function(c) { totalTokens += (c.total_tokens || 0); totalLatency += (c.latency_ms || 0); totalCost += (c.estimated_cost_usd || 0); });
+      html += '<div class="card" style="margin-bottom:16px;border-left:4px solid #8b5cf6">';
+      html += '<div class="card-header"><h2 class="card-title">🔍 LLM Trace (' + llmCalls.length + ' call' + (llmCalls.length === 1 ? '' : 's') + ')</h2><span class="badge" style="background:rgba(139,92,246,0.15);color:#8b5cf6">Observability</span></div>';
+      html += '<div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">Token usage, latency, and cost for every LLM call in this investigation.</div>';
+      html += '<table style="width:100%;font-size:13px;border-collapse:collapse"><thead><tr style="border-bottom:1px solid var(--border);color:var(--text-muted);font-size:11px;text-transform:uppercase"><th style="text-align:left;padding:8px 4px">Agent</th><th style="text-align:right;padding:8px 4px">Tokens</th><th style="text-align:right;padding:8px 4px">Latency</th><th style="text-align:right;padding:8px 4px">Cost</th></tr></thead><tbody>';
+      llmCalls.forEach(function(c) {
+        var agentLabel = c.agent_name.charAt(0).toUpperCase() + c.agent_name.slice(1);
+        var status = c.success ? '' : ' <span style="color:#ef4444">✗</span>';
+        html += '<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 4px">' + escapeHtml(agentLabel) + status + '</td><td style="text-align:right;padding:8px 4px">' + (c.total_tokens || 0).toLocaleString() + '</td><td style="text-align:right;padding:8px 4px">' + ((c.latency_ms || 0) / 1000).toFixed(1) + 's</td><td style="text-align:right;padding:8px 4px">$' + (c.estimated_cost_usd || 0).toFixed(6) + '</td></tr>';
+      });
+      html += '</tbody><tfoot><tr style="border-top:2px solid var(--border);font-weight:600"><td style="padding:8px 4px">Total</td><td style="text-align:right;padding:8px 4px">' + totalTokens.toLocaleString() + '</td><td style="text-align:right;padding:8px 4px">' + (totalLatency / 1000).toFixed(1) + 's</td><td style="text-align:right;padding:8px 4px">$' + totalCost.toFixed(6) + '</td></tr></tfoot></table>';
+      html += '</div>';
+    }
+    // Investigation card
     if (investigation) {
       html += '<div class="card" style="margin-bottom:16px"><div class="card-header"><h2 class="card-title">AI Investigation</h2></div><div style="margin-bottom:16px"><div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Root Cause</div><div style="font-size:16px;font-weight:600;margin-bottom:8px">' + escapeHtml(investigation.root_cause || 'Unknown') + '</div><div style="display:flex;align-items:center;gap:12px"><span style="font-size:12px;color:var(--text-muted)">Confidence</span><div style="flex:1;max-width:200px;height:8px;background:var(--bg-elevated);border-radius:4px;overflow:hidden"><div style="width:' + Math.round((investigation.confidence || 0) * 100) + '%;height:100%;background:var(--accent)"></div></div><span style="font-size:13px;font-weight:600">' + Math.round((investigation.confidence || 0) * 100) + '%</span></div></div>';
       if (investigation.steps && investigation.steps.length > 0) {
@@ -69,6 +91,7 @@
     } else {
       html += '<div class="card" style="margin-bottom:16px"><div class="empty-state"><div class="empty-state-title">No investigation yet</div></div></div>';
     }
+    // Approval card
     if (approval) {
       html += '<div class="card" style="margin-bottom:16px"><div class="card-header"><h2 class="card-title">Proposed Remediation</h2><span class="badge badge-' + escapeHtml(approval.status) + '">' + escapeHtml(approval.status) + '</span></div>';
       if (approval.proposed_actions && approval.proposed_actions.length > 0) {
@@ -81,15 +104,18 @@
       }
       html += '</div>';
     }
+    // Timeline
     html += '<div class="card"><div class="card-header"><h2 class="card-title">Timeline</h2></div><div class="timeline"><div class="timeline-item"><div class="timeline-title">Incident created</div><div class="timeline-meta">' + formatDate(incident.created_at) + '</div></div>';
     if (investigation) {
       html += '<div class="timeline-item"><div class="timeline-title">Investigation started</div><div class="timeline-meta">' + formatDate(investigation.started_at) + '</div></div>';
       if (runbooks.length > 0) { html += '<div class="timeline-item"><div class="timeline-title">' + runbooks.length + ' runbook(s) matched</div><div class="timeline-meta">' + runbooks.map(function(r) { return r.code; }).join(', ') + '</div></div>'; }
+      if (llmCalls.length > 0) { html += '<div class="timeline-item"><div class="timeline-title">' + llmCalls.length + ' LLM call(s) traced</div><div class="timeline-meta">' + llmCalls.length + ' calls · $' + (llmCalls.reduce(function(s, c) { return s + (c.estimated_cost_usd || 0); }, 0)).toFixed(6) + '</div></div>'; }
       if (investigation.finished_at) { html += '<div class="timeline-item"><div class="timeline-title">Investigation completed</div><div class="timeline-meta">' + formatDate(investigation.finished_at) + '</div></div>'; }
     }
     if (approval) { html += '<div class="timeline-item"><div class="timeline-title">Approval requested</div><div class="timeline-meta">' + formatDate(approval.created_at) + '</div></div>'; }
     html += '</div></div>';
     document.getElementById('main-content').innerHTML = html;
+    // Wire up approve/reject
     const approveBtn = document.getElementById('approve-btn');
     const rejectBtn = document.getElementById('reject-btn');
     if (approveBtn) { approveBtn.addEventListener('click', async () => { approveBtn.disabled = true; try { await api.approveApproval(approval.id); showToast('Approved', 'success'); setTimeout(load, 500); } catch (e) { showToast('Failed: ' + e.message, 'error'); approveBtn.disabled = false; } }); }
