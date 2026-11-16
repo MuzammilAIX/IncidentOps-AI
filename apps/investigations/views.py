@@ -1,4 +1,4 @@
-from rest_framework import viewsets, filters, permissions
+from rest_framework import viewsets, filters, permissions, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -40,6 +40,26 @@ class InvestigationViewSet(viewsets.ModelViewSet):
             "service": service_name,
             "runbooks": matches,
         })
+
+    @action(detail=True, methods=["post", "get"], url_path="feedback", permission_classes=[permissions.IsAuthenticated])
+    def feedback(self, request, pk=None):
+        from .models import Feedback
+        from .serializers import FeedbackSerializer
+        inv = self.get_object()
+        if request.method == "GET":
+            fb_list = inv.feedback_entries.all()
+            return Response({"count": fb_list.count(), "results": FeedbackSerializer(fb_list, many=True).data})
+        verdict = request.data.get("verdict", "").strip().lower()
+        if verdict not in ("correct", "partial", "wrong", "unclear"):
+            return Response({"error": "invalid verdict"}, status=400)
+        fb = Feedback.objects.create(
+            investigation=inv,
+            user=request.user if request.user.is_authenticated else None,
+            verdict=verdict,
+            comment=request.data.get("comment", "").strip(),
+            actual_root_cause=request.data.get("actual_root_cause", "").strip(),
+        )
+        return Response(FeedbackSerializer(fb).data, status=201)
 
 
 class InvestigationStepViewSet(viewsets.ModelViewSet):

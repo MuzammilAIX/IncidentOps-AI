@@ -61,3 +61,15 @@ class InvestigationSerializer(serializers.ModelSerializer):
         if validated_data.get("findings") is None:
             validated_data["findings"] = []
         return super().update(instance, validated_data)
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    user_username = serializers.CharField(source="user.username", read_only=True)
+
+    class Meta:
+        from .models import Feedback
+        model = Feedback
+        fields = [
+            "id", "investigation", "user", "user_username",
+            "verdict", "comment", "actual_root_cause", "created_at",
+        ]
+        read_only_fields = ["id", "user", "created_at"]
