@@ -80,3 +80,32 @@ class LLMCallViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filterset_fields = ["investigation", "agent_name", "success"]
     ordering = ["-created_at"]
+
+class RunbookViewSet(viewsets.ReadOnlyModelViewSet):
+    """Read-only API for team runbooks — searchable, browsable."""
+    from .models import Runbook
+    from .serializers import RunbookSerializer
+    queryset = Runbook.objects.all()
+    serializer_class = RunbookSerializer
+    permission_classes = [AllowAny]
+    filter_backends = []
+    search_fields = ["code", "title", "content", "keywords"]
+    filterset_fields = ["category"]
+    ordering = ["code"]
+
+    def list(self, request, *args, **kwargs):
+        """Support ?search=... and ?category=..."""
+        qs = self.get_queryset()
+        search = request.query_params.get("search", "").strip().lower()
+        category = request.query_params.get("category", "").strip()
+        if search:
+            qs = qs.filter(
+                models.Q(title__icontains=search) |
+                models.Q(content__icontains=search) |
+                models.Q(code__icontains=search) |
+                models.Q(keywords__icontains=search)
+            )
+        if category:
+            qs = qs.filter(category=category)
+        serializer = self.get_serializer(qs, many=True)
+        return Response({"count": qs.count(), "results": serializer.data})
