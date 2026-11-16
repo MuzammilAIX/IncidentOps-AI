@@ -43,7 +43,12 @@
           --access-logfile - \
           --error-logfile -
     volumes:
-      - staticfiles:/app/staticfiles
+        - staticfiles:/app/staticfiles
+        - ./apps:/app/apps
+        - ./ai_engine:/app/ai_engine
+        - ./config:/app/config
+        - ./frontend:/app/frontend
+        - ./scripts:/app/scripts
     ports:
       - "8000:8000"
     depends_on:

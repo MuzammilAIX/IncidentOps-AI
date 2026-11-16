@@ -86,3 +86,30 @@ class Anomaly(models.Model):
 
     def __str__(self):
         return f"{self.anomaly_type} on {self.service.name}"
+
+class Runbook(models.Model):
+    """Team runbook — trusted troubleshooting instructions the agent can consult."""
+    CATEGORIES = [
+        ("network", "Network"),
+        ("database", "Database"),
+        ("container", "Container / Docker"),
+        ("deployment", "Deployment / Rollback"),
+        ("resource", "CPU / Memory"),
+        ("auth", "Authentication"),
+        ("other", "Other"),
+    ]
+
+    code = models.CharField(max_length=32, unique=True)       # e.g., "RB-102"
+    title = models.CharField(max_length=255)
+    category = models.CharField(max_length=16, choices=CATEGORIES, default="other")
+    content = models.TextField()
+    keywords = models.JSONField(default=list, blank=True)     # ["payment", "500", "migration"]
+    service_hint = models.CharField(max_length=128, blank=True)  # optional: applies to specific service
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["code"]
+
+    def __str__(self):
+        return f"{self.code} — {self.title}"

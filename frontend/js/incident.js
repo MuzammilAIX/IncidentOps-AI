@@ -7,166 +7,93 @@
   async function init() {
     incidentId = getQueryParam('id');
     if (!incidentId) {
-      document.getElementById('main-content').innerHTML =
-        '<div class="empty-state"><div class="empty-state-title">No incident ID</div></div>';
+      document.getElementById('main-content').innerHTML = '<div class="empty-state"><div class="empty-state-title">No incident ID</div></div>';
       return;
     }
-
     try {
       const user = await api.me();
-      document.getElementById('user-info').innerHTML =
-        '<div style="font-size:13px;color:var(--text-primary);font-weight:600">' +
-        escapeHtml(user.username) + '</div>';
-    } catch (e) {
-      return;
-    }
-
+      document.getElementById('user-info').innerHTML = '<div style="font-size:13px;color:var(--text-primary);font-weight:600">' + escapeHtml(user.username) + '</div>';
+    } catch (e) { return; }
     document.getElementById('logout-btn').addEventListener('click', async () => {
       try { await api.logout(); } catch (e) {}
       window.location.href = '/login/';
     });
-
     await load();
     refreshTimer = setInterval(load, 10000);
   }
+
   async function load() {
     try {
       const [incident, investigations] = await Promise.all([
         api.getIncident(incidentId),
         api.getInvestigations({ incident: incidentId }),
       ]);
-
       const investigation = investigations.results && investigations.results[0];
       let approval = null;
-
+      let runbooks = [];
       if (investigation) {
-        const approvals = await api.getApprovals({ investigation: investigation.id });
-        approval = approvals.results && approvals.results[0];
+        const [approvalsResp, runbooksResp] = await Promise.all([
+          api.getApprovals({ investigation: investigation.id }).catch(() => ({ results: [] })),
+          fetch('/api/investigations/' + investigation.id + '/runbooks/', { credentials: 'include' }).then(r => r.ok ? r.json() : { runbooks: [] }).catch(() => ({ runbooks: [] })),
+        ]);
+        approval = approvalsResp.results && approvalsResp.results[0];
+        runbooks = runbooksResp.runbooks || [];
       }
-
-      render(incident, investigation, approval);
+      render(incident, investigation, approval, runbooks);
       document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
     } catch (e) {
       console.error('Load failed:', e);
-      document.getElementById('main-content').innerHTML =
-        '<div class="empty-state"><div class="empty-state-title">Failed to load incident</div></div>';
+      document.getElementById('main-content').innerHTML = '<div class="empty-state"><div class="empty-state-title">Failed to load incident</div></div>';
     }
   }
 
-  function render(incident, investigation, approval) {
+  function render(incident, investigation, approval, runbooks) {
     document.getElementById('incident-title').textContent = 'Incident #' + incident.id;
-
     let html = '';
-
-    html += '<div class="card" style="margin-bottom:16px">' +
-      '<h2 style="font-size:20px;margin-bottom:8px">' + escapeHtml(incident.title) + '</h2>' +
-      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">' +
-        severityBadge(incident.severity) +
-        statusBadge(incident.status) +
-        (incident.service_name ? '<span class="badge" style="background:var(--bg-elevated);color:var(--text-secondary)">' + escapeHtml(incident.service_name) + '</span>' : '') +
-      '</div>' +
-      '<div style="font-size:13px;color:var(--text-muted)">Created ' + timeAgo(incident.created_at) + '</div>' +
-      (incident.description ? '<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);color:var(--text-secondary)">' + escapeHtml(incident.description) + '</div>' : '') +
-    '</div>';
+    html += '<div class="card" style="margin-bottom:16px"><h2 style="font-size:20px;margin-bottom:8px">' + escapeHtml(incident.title) + '</h2><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">' + severityBadge(incident.severity) + statusBadge(incident.status) + (incident.service_name ? '<span class="badge" style="background:var(--bg-elevated);color:var(--text-secondary)">' + escapeHtml(incident.service_name) + '</span>' : '') + '</div><div style="font-size:13px;color:var(--text-muted)">Created ' + timeAgo(incident.created_at) + '</div>' + (incident.description ? '<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);color:var(--text-secondary)">' + escapeHtml(incident.description) + '</div>' : '') + '</div>';
+    if (runbooks && runbooks.length > 0) {
+      html += '<div class="card" style="margin-bottom:16px;border-left:4px solid var(--accent)"><div class="card-header"><h2 class="card-title">📖 Matched Runbooks (' + runbooks.length + ')</h2><span class="badge" style="background:var(--accent-bg);color:var(--accent-hover)">Knowledge Base</span></div><div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">These runbooks from your team knowledge base match this incident. The AI agent consulted them during diagnosis.</div>';
+      runbooks.forEach(function(rb) {
+        html += '<div style="padding:14px;background:var(--bg-elevated);border-radius:8px;margin-bottom:10px"><div style="margin-bottom:6px"><div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:4px"><code style="background:var(--accent-bg);color:var(--accent-hover);padding:2px 6px;border-radius:4px;font-size:12px">' + escapeHtml(rb.code) + '</code> ' + escapeHtml(rb.title) + '</div><div style="font-size:11px;color:var(--text-muted)">Category: ' + escapeHtml(rb.category) + '  |  Match score: ' + rb.score + '</div></div><div style="margin-top:8px;padding:10px;background:var(--bg-primary);border-radius:6px;font-size:12px;color:var(--text-secondary);line-height:1.5">' + escapeHtml(rb.content) + '</div></div>';
+      });
+      html += '</div>';
+    }
     if (investigation) {
-      html += '<div class="card" style="margin-bottom:16px">' +
-        '<div class="card-header"><h2 class="card-title">AI Investigation</h2></div>' +
-        '<div style="margin-bottom:16px">' +
-          '<div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Root Cause</div>' +
-          '<div style="font-size:16px;font-weight:600;margin-bottom:8px">' + escapeHtml(investigation.root_cause || 'Unknown') + '</div>' +
-          '<div style="display:flex;align-items:center;gap:12px">' +
-            '<span style="font-size:12px;color:var(--text-muted)">Confidence</span>' +
-            '<div style="flex:1;max-width:200px;height:8px;background:var(--bg-elevated);border-radius:4px;overflow:hidden"><div style="width:' + Math.round((investigation.confidence || 0) * 100) + '%;height:100%;background:var(--accent)"></div></div>' +
-            '<span style="font-size:13px;font-weight:600">' + Math.round((investigation.confidence || 0) * 100) + '%</span>' +
-          '</div>' +
-        '</div>';
-
+      html += '<div class="card" style="margin-bottom:16px"><div class="card-header"><h2 class="card-title">AI Investigation</h2></div><div style="margin-bottom:16px"><div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Root Cause</div><div style="font-size:16px;font-weight:600;margin-bottom:8px">' + escapeHtml(investigation.root_cause || 'Unknown') + '</div><div style="display:flex;align-items:center;gap:12px"><span style="font-size:12px;color:var(--text-muted)">Confidence</span><div style="flex:1;max-width:200px;height:8px;background:var(--bg-elevated);border-radius:4px;overflow:hidden"><div style="width:' + Math.round((investigation.confidence || 0) * 100) + '%;height:100%;background:var(--accent)"></div></div><span style="font-size:13px;font-weight:600">' + Math.round((investigation.confidence || 0) * 100) + '%</span></div></div>';
       if (investigation.steps && investigation.steps.length > 0) {
-        html += '<div style="padding-top:16px;border-top:1px solid var(--border)">' +
-          '<div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Reasoning Steps</div>' +
-          '<div style="display:flex;gap:6px;flex-wrap:wrap">';
-        investigation.steps.forEach(function(s) {
-          html += '<span class="badge" style="background:var(--accent-bg);color:var(--accent-hover)">' + escapeHtml(s.name) + '</span>';
-        });
+        html += '<div style="padding-top:16px;border-top:1px solid var(--border)"><div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Reasoning Steps</div><div style="display:flex;gap:6px;flex-wrap:wrap">';
+        investigation.steps.forEach(function(s) { html += '<span class="badge" style="background:var(--accent-bg);color:var(--accent-hover)">' + escapeHtml(s.name) + '</span>'; });
         html += '</div></div>';
       }
-
       html += '</div>';
     } else {
       html += '<div class="card" style="margin-bottom:16px"><div class="empty-state"><div class="empty-state-title">No investigation yet</div></div></div>';
     }
-
     if (approval) {
-      html += '<div class="card" style="margin-bottom:16px">' +
-        '<div class="card-header"><h2 class="card-title">Proposed Remediation</h2>' +
-        '<span class="badge badge-' + escapeHtml(approval.status) + '">' + escapeHtml(approval.status) + '</span></div>';
-
+      html += '<div class="card" style="margin-bottom:16px"><div class="card-header"><h2 class="card-title">Proposed Remediation</h2><span class="badge badge-' + escapeHtml(approval.status) + '">' + escapeHtml(approval.status) + '</span></div>';
       if (approval.proposed_actions && approval.proposed_actions.length > 0) {
-        approval.proposed_actions.forEach(function(a, i) {
-          html += '<div style="padding:16px;background:var(--bg-elevated);border-radius:8px;margin-bottom:12px">' +
-            '<div style="font-weight:600;margin-bottom:6px">Option ' + (i + 1) + '</div>' +
-            '<div style="font-size:14px;margin-bottom:6px"><strong>' + escapeHtml(a.action || '') + '</strong> on <code>' + escapeHtml(a.target || '') + '</code></div>' +
-            (a.reason ? '<div style="font-size:13px;color:var(--text-secondary)">' + escapeHtml(a.reason) + '</div>' : '') +
-          '</div>';
-        });
+        approval.proposed_actions.forEach(function(a, i) { html += '<div style="padding:16px;background:var(--bg-elevated);border-radius:8px;margin-bottom:12px"><div style="font-weight:600;margin-bottom:6px">Option ' + (i + 1) + '</div><div style="font-size:14px;margin-bottom:6px"><strong>' + escapeHtml(a.action || '') + '</strong> on <code>' + escapeHtml(a.target || '') + '</code></div>' + (a.reason ? '<div style="font-size:13px;color:var(--text-secondary)">' + escapeHtml(a.reason) + '</div>' : '') + '</div>'; });
       }
-
       if (approval.status === 'pending') {
-        html += '<div style="display:flex;gap:8px;margin-top:16px">' +
-          '<button class="btn btn-success" id="approve-btn">Approve</button>' +
-          '<button class="btn btn-danger" id="reject-btn">Reject</button>' +
-        '</div>';
+        html += '<div style="display:flex;gap:8px;margin-top:16px"><button class="btn btn-success" id="approve-btn">Approve</button><button class="btn btn-danger" id="reject-btn">Reject</button></div>';
       } else {
         html += '<div style="font-size:13px;color:var(--text-muted);margin-top:12px">Decision: <strong>' + escapeHtml(approval.status) + '</strong></div>';
       }
-
       html += '</div>';
     }
-    html += '<div class="card"><div class="card-header"><h2 class="card-title">Timeline</h2></div><div class="timeline">' +
-      '<div class="timeline-item"><div class="timeline-title">Incident created</div><div class="timeline-meta">' + formatDate(incident.created_at) + '</div></div>';
+    html += '<div class="card"><div class="card-header"><h2 class="card-title">Timeline</h2></div><div class="timeline"><div class="timeline-item"><div class="timeline-title">Incident created</div><div class="timeline-meta">' + formatDate(incident.created_at) + '</div></div>';
     if (investigation) {
       html += '<div class="timeline-item"><div class="timeline-title">Investigation started</div><div class="timeline-meta">' + formatDate(investigation.started_at) + '</div></div>';
-      if (investigation.finished_at) {
-        html += '<div class="timeline-item"><div class="timeline-title">Investigation completed</div><div class="timeline-meta">' + formatDate(investigation.finished_at) + '</div></div>';
-      }
+      if (runbooks.length > 0) { html += '<div class="timeline-item"><div class="timeline-title">' + runbooks.length + ' runbook(s) matched</div><div class="timeline-meta">' + runbooks.map(function(r) { return r.code; }).join(', ') + '</div></div>'; }
+      if (investigation.finished_at) { html += '<div class="timeline-item"><div class="timeline-title">Investigation completed</div><div class="timeline-meta">' + formatDate(investigation.finished_at) + '</div></div>'; }
     }
-    if (approval) {
-      html += '<div class="timeline-item"><div class="timeline-title">Approval requested</div><div class="timeline-meta">' + formatDate(approval.created_at) + '</div></div>';
-    }
+    if (approval) { html += '<div class="timeline-item"><div class="timeline-title">Approval requested</div><div class="timeline-meta">' + formatDate(approval.created_at) + '</div></div>'; }
     html += '</div></div>';
-
     document.getElementById('main-content').innerHTML = html;
-
     const approveBtn = document.getElementById('approve-btn');
     const rejectBtn = document.getElementById('reject-btn');
-
-    if (approveBtn) {
-      approveBtn.addEventListener('click', async () => {
-        approveBtn.disabled = true;
-        try {
-          await api.approveApproval(approval.id);
-          showToast('Approved', 'success');
-          setTimeout(load, 500);
-        } catch (e) {
-          showToast('Failed: ' + e.message, 'error');
-          approveBtn.disabled = false;
-        }
-      });
-    }
-
-    if (rejectBtn) {
-      rejectBtn.addEventListener('click', async () => {
-        rejectBtn.disabled = true;
-        try {
-          await api.rejectApproval(approval.id);
-          showToast('Rejected', 'success');
-          setTimeout(load, 500);
-        } catch (e) {
-          showToast('Failed: ' + e.message, 'error');
-          rejectBtn.disabled = false;
-        }
-      });
-    }
+    if (approveBtn) { approveBtn.addEventListener('click', async () => { approveBtn.disabled = true; try { await api.approveApproval(approval.id); showToast('Approved', 'success'); setTimeout(load, 500); } catch (e) { showToast('Failed: ' + e.message, 'error'); approveBtn.disabled = false; } }); }
+    if (rejectBtn) { rejectBtn.addEventListener('click', async () => { rejectBtn.disabled = true; try { await api.rejectApproval(approval.id); showToast('Rejected', 'success'); setTimeout(load, 500); } catch (e) { showToast('Failed: ' + e.message, 'error'); rejectBtn.disabled = false; } }); }
   }
 
   init();

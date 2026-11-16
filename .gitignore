@@ -44,3 +44,23 @@ node_modules/
 # UV
 uv.lock
 .env
+
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+*.backup
+.env.dev.backup
+.env.prod
+.env.local
+
+# Session/debug artifacts
+cookies*.txt
+project-tree.txt
+*.log
+celerybeat-schedule*
+__pycache__/
+*.pyc
+
+# Screenshots (local only — commit specific ones to docs/screenshots/)
+screenshots-temp/
