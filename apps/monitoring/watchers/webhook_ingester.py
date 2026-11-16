@@ -56,3 +56,41 @@ class WebhookIngester(BaseWatcher):
             details=payload,
         )
         return 1
+
+
+    @staticmethod
+    def ingest_as_incident(payload: dict) -> dict:
+        """Create an Incident (not just Anomaly) from an external alert."""
+        from apps.monitoring.models import Anomaly
+        from apps.incidents.models import Incident
+        from apps.services.models import Service
+
+        service_name = payload.get("service", "unknown")
+        service = Service.objects.filter(name=service_name).first()
+
+        severity = payload.get("severity", "medium")
+        if severity not in ("low", "medium", "high", "critical"):
+            severity = "medium"
+
+        title = payload.get("name") or payload.get("title") or "External alert"
+        description = payload.get("description") or payload.get("summary") or ""
+
+        incident = Incident.objects.create(
+            title=title,
+            description=description,
+            severity=severity,
+            status="open",
+            service=service,
+        )
+
+        if service:
+            Anomaly.objects.create(
+                service=service,
+                anomaly_type=payload.get("type", "external_webhook"),
+                severity=severity,
+                score=payload.get("score", 1.0),
+                details=payload,
+                incident=incident,
+            )
+
+        return {"incident_id": incident.id, "service": service_name}

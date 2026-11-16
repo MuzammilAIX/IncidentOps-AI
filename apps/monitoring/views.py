@@ -29,9 +29,32 @@ def grafana_webhook(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def generic_webhook(request):
+    """Generic webhook: creates an Incident + auto-triggers AI investigation."""
     from apps.monitoring.watchers.webhook_ingester import WebhookIngester
-    count = WebhookIngester.ingest_generic(request.data)
-    return Response({"ingested": count}, status=status.HTTP_201_CREATED)
+    from apps.incidents.services import trigger_investigation
+    from apps.incidents.models import Incident
+
+    try:
+        result = WebhookIngester.ingest_as_incident(request.data)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    triggered = False
+    task_id = None
+    try:
+        incident = Incident.objects.get(id=result["incident_id"])
+        queue_result = trigger_investigation(incident)
+        triggered = queue_result.get("queued", False)
+        task_id = queue_result.get("task_id")
+    except Exception:
+        pass
+
+    return Response({
+        "incident_id": result["incident_id"],
+        "service": result["service"],
+        "investigation_triggered": triggered,
+        "task_id": task_id,
+    }, status=status.HTTP_201_CREATED)
 
 
 @api_view(["GET"])

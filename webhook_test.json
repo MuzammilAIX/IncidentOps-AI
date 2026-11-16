@@ -1,0 +1,1 @@
+{"service":"payment-service","severity":"critical","name":"Webhook automation test","description":"Full pipeline: alert to investigation","type":"external_alert"}
