@@ -1,4 +1,4 @@
-﻿/* IncidentOps-AI - Approvals Queue */
+/* IncidentOps-AI - Approvals Queue */
 
 (function() {
   async function init() {
@@ -75,7 +75,7 @@
       '<div class="card-header">' +
         '<div>' +
           '<div style="font-size:14px;font-weight:600">' + escapeHtml(a.incident_title || 'Incident') + '</div>' +
-          '<div style="font-size:12px;color:var(--text-muted)">Investigation #' + escapeHtml(String(a.investigation)) + ' · ' + timeAgo(a.created_at) + '</div>' +
+          '<div style="font-size:12px;color:var(--text-muted)">Investigation #' + escapeHtml(String(a.investigation)) + ' - ' + timeAgo(a.created_at) + '</div>' +
         '</div>' +
         '<span class="badge badge-' + escapeHtml(a.status) + '">' + escapeHtml(a.status) + '</span>' +
       '</div>' +

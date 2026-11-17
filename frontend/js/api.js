@@ -1,4 +1,4 @@
-﻿/* IncidentOps-AI API Client */
+/* IncidentOps-AI API Client */
 
 function getCookie(name) {
   const value = '; ' + document.cookie;

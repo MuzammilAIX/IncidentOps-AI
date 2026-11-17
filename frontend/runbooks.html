@@ -1,23 +1,23 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Runbooks - IncidentOps-AI</title>
-  <link rel="stylesheet" href="/static/css/styles.css">
+  <link rel="stylesheet" href="/static/css/styles.css?v=21">
+  <link rel="icon" type="image/png" href="/static/img/favicon.png">
 </head>
 <body>
   <div class="app">
     <aside class="sidebar">
-      <div class="sidebar-logo">
-        <div class="sidebar-logo-icon">ðŸš¨</div>
-        <span>IncidentOps-AI</span>
-      </div>
+      <div class="sidebar-logo" style="display: flex; align-items: center; gap: 10px; padding: 16px;">
+  <img src="/static/img/logo-white.png" style="height: 35px; width: auto; object-fit: contain; background: transparent; border: none; box-shadow: none; mix-blend-mode: screen;">
+</div>
       <nav class="sidebar-nav">
-        <a href="/" class="nav-item"><span class="nav-item-icon">ðŸ“Š</span><span>Dashboard</span></a>
-        <a href="/incidents/" class="nav-item"><span class="nav-item-icon">ðŸš¨</span><span>Incidents</span></a>
-        <a href="/runbooks/" class="nav-item active"><span class="nav-item-icon">ðŸ“–</span><span>Runbooks</span></a>
-        <a href="/approvals/" class="nav-item"><span class="nav-item-icon">âœ…</span><span>Approvals</span></a>
+        <a href="/" class="nav-item"><span class="nav-item-icon">📊</span><span>Dashboard</span></a>
+        <a href="/incidents/" class="nav-item"><span class="nav-item-icon">🚨</span><span>Incidents</span></a>
+        <a href="/runbooks/" class="nav-item active"><span class="nav-item-icon">📖</span><span>Runbooks</span></a>
+        <a href="/approvals/" class="nav-item"><span class="nav-item-icon">✅</span><span>Approvals</span></a>
       </nav>
       <div class="sidebar-footer">
         <div id="user-info">Loading...</div>
@@ -26,7 +26,7 @@
     </aside>
     <div class="main-wrapper">
       <header class="header">
-        <h1 class="header-title">ðŸ“– Team Runbooks</h1>
+        <h1 class="header-title"> Team Runbooks</h1>
         <div class="header-actions">
           <span id="result-count" style="font-size:13px;color:var(--text-muted)"></span>
         </div>
@@ -59,8 +59,9 @@
       </main>
     </div>
   </div>
-  <script src="/static/js/api.js?v=12"></script>
-  <script src="/static/js/utils.js?v=12"></script>
-  <script src="/static/js/runbooks.js?v=12"></script>
+  <script src="/static/js/api.js?v=18"></script>
+  <script src="/static/js/utils.js?v=18"></script>
+  <script src="/static/js/runbooks.js?v=18"></script>
+  <script src="/static/js/widget.js?v=26"></script>
 </body>
 </html>

@@ -1,7 +1,7 @@
-﻿/* ═══════════════════════════════════════════════════════════
-   IncidentOps-AI — Design System
-   Dark theme • Modern cards • Professional SRE aesthetic
-   ═══════════════════════════════════════════════════════════ */
+/* 
+   IncidentOps-AI  Design System
+   Dark theme  Modern cards  Professional SRE aesthetic
+    */
 
 :root {
   /* Backgrounds */
@@ -61,7 +61,7 @@
   --font-mono: 'SF Mono', 'Monaco', 'Consolas', monospace;
 }
 
-/* ─── Reset ──────────────────────────────────────────────── */
+/*  Reset  */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -99,7 +99,7 @@ button {
   color: inherit;
 }
 
-/* ─── Layout ─────────────────────────────────────────────── */
+/*  Layout  */
 .app {
   display: flex;
   min-height: 100vh;
@@ -231,7 +231,7 @@ button {
   margin: 0 auto;
 }
 
-/* ─── Cards ──────────────────────────────────────────────── */
+/*  Cards  */
 .card {
   background: var(--bg-surface);
   border: 1px solid var(--border);
@@ -293,7 +293,7 @@ button {
   margin-top: 4px;
 }
 
-/* ─── Incident Cards ─────────────────────────────────────── */
+/*  Incident Cards  */
 .incident-list {
   display: flex;
   flex-direction: column;
@@ -351,7 +351,7 @@ button {
   border-top: 1px solid var(--border);
 }
 
-/* ─── Badges ─────────────────────────────────────────────── */
+/*  Badges  */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -415,7 +415,7 @@ button {
   color: var(--status-rejected);
 }
 
-/* ─── Buttons ────────────────────────────────────────────── */
+/*  Buttons  */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -478,7 +478,7 @@ button {
   cursor: not-allowed;
 }
 
-/* ─── Forms ──────────────────────────────────────────────── */
+/*  Forms  */
 .form-group {
   margin-bottom: 16px;
 }
@@ -512,7 +512,7 @@ button {
   border-color: var(--accent);
 }
 
-/* ─── Login Page ─────────────────────────────────────────── */
+/*  Login Page  */
 .login-wrapper {
   min-height: 100vh;
   display: flex;
@@ -576,7 +576,7 @@ button {
   display: block;
 }
 
-/* ─── Timeline ───────────────────────────────────────────── */
+/*  Timeline  */
 .timeline {
   position: relative;
   padding-left: 24px;
@@ -621,7 +621,7 @@ button {
   margin-top: 2px;
 }
 
-/* ─── Hypothesis Tree ────────────────────────────────────── */
+/*  Hypothesis Tree  */
 .hypothesis-tree {
   padding: 8px 0;
 }
@@ -668,7 +668,7 @@ button {
   margin-bottom: 2px;
 }
 
-/* ─── Loading ────────────────────────────────────────────── */
+/*  Loading  */
 .spinner {
   display: inline-block;
   width: 16px;
@@ -692,7 +692,7 @@ button {
   gap: 12px;
 }
 
-/* ─── Empty State ────────────────────────────────────────── */
+/*  Empty State  */
 .empty-state {
   text-align: center;
   padding: 60px 20px;
@@ -712,7 +712,7 @@ button {
   margin-bottom: 8px;
 }
 
-/* ─── Tables ─────────────────────────────────────────────── */
+/*  Tables  */
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -739,7 +739,7 @@ button {
   background: var(--bg-hover);
 }
 
-/* ─── Toast ──────────────────────────────────────────────── */
+/*  Toast  */
 .toast-container {
   position: fixed;
   top: 80px;
@@ -782,7 +782,7 @@ button {
   }
 }
 
-/* ─── Responsive ─────────────────────────────────────────── */
+/*  Responsive  */
 @media (max-width: 768px) {
   :root {
     --sidebar-width: 0px;
@@ -804,4 +804,294 @@ button {
   .card-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ============================================================
+   Black / Gold / Yellow / Red theme — matches auth pages
+   ============================================================ */
+:root {
+  --bg-base: #0a0a0a;
+  --bg-surface: #0f0f0f;
+  --bg-elevated: #141414;
+  --bg-hover: #1c1c1c;
+
+  --text-primary: #f5f5f5;
+  --text-secondary: #c9c9c9;
+  --text-muted: #a3a3a3;
+
+  --border: #2a2a2a;
+  --border-strong: #3a3a3a;
+
+  --accent: #d4af37;
+  --accent-hover: #f5d76e;
+  --accent-bg: rgba(212,175,55,.14);
+
+  /* Severity */
+  --critical: #dc2626;
+  --critical-bg: rgba(220,38,38,.15);
+  --high: #f97316;
+  --high-bg: rgba(249,115,22,.15);
+  --medium: #ffd700;
+  --medium-bg: rgba(255,215,0,.15);
+  --low: #d4af37;
+  --low-bg: rgba(212,175,55,.15);
+
+  /* Status */
+  --status-open: #ffd700;
+  --status-open-bg: rgba(255,215,0,.15);
+  --status-investigating: #f5d76e;
+  --status-investigating-bg: rgba(245,215,110,.15);
+  --status-resolved: #d4af37;
+  --status-resolved-bg: rgba(212,175,55,.15);
+  --status-pending: #ffd700;
+  --status-pending-bg: rgba(255,215,0,.15);
+  --status-approved: #d4af37;
+  --status-approved-bg: rgba(212,175,55,.15);
+  --status-rejected: #dc2626;
+  --status-rejected-bg: rgba(220,38,38,.15);
+}
+
+/* Body glow */
+body {
+  background: radial-gradient(circle at 20% 0%, #1a1408 0%, #0a0a0a 45%, #000 100%);
+  color: var(--text-primary);
+}
+
+/* Sidebar */
+.sidebar {
+  background: linear-gradient(180deg, #0f0f0f 0%, #0a0a0a 100%);
+  border-right: 1px solid var(--border);
+}
+.sidebar-logo { color: var(--accent-hover); }
+.nav-item { color: var(--text-secondary); }
+.nav-item:hover { background: var(--bg-hover); color: var(--accent-hover); }
+.nav-item.active {
+  background: rgba(212,175,55,.12);
+  color: var(--accent-hover);
+  border-left: 2px solid var(--accent);
+}
+
+/* Header */
+.header { background: #0d0d0d; border-bottom: 1px solid var(--border); }
+.header-title { color: var(--accent-hover); }
+
+/* Cards — gold top border + glow */
+.card {
+  background: linear-gradient(180deg, #141414 0%, #0d0d0d 100%);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--accent);
+  box-shadow: 0 8px 28px rgba(0,0,0,.5), 0 0 40px rgba(212,175,55,.04);
+}
+.card-title { color: var(--accent-hover); }
+
+/* Primary button — yellow → red gradient */
+.btn-primary {
+  background: linear-gradient(135deg, #ffd700 0%, #f5d76e 40%, #dc2626 100%);
+  color: #1a1100;
+  border: 0;
+  font-weight: 700;
+  box-shadow: 0 4px 18px rgba(255,215,0,.2), 0 2px 8px rgba(220,38,38,.2);
+}
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+  box-shadow: 0 6px 22px rgba(255,215,0,.3), 0 4px 12px rgba(220,38,38,.3);
+}
+.btn-primary:disabled { opacity: .55; cursor: not-allowed; }
+
+.btn-ghost { border: 1px solid var(--border); color: var(--text-secondary); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent-hover); }
+
+.btn-success { background: linear-gradient(135deg, #d4af37, #f5d76e); color: #1a1100; border: 0; font-weight: 700; }
+
+/* Inputs */
+input, select, textarea, .form-input {
+  background: #050505;
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+}
+input:focus, select:focus, textarea:focus, .form-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(212,175,55,.15);
+  outline: none;
+}
+
+/* Timeline accents */
+.timeline-title { color: var(--accent-hover); }
+
+/* Toasts */
+.toast.success { background: #14532d; }
+.toast.error { background: #7f1d1d; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #0a0a0a; }
+::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ===== Red Sign Out button ===== */
+#logout-btn {
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%) !important;
+  color: #fff !important;
+  border: 0 !important;
+  font-weight: 700 !important;
+  transition: filter .15s, transform .12s;
+}
+#logout-btn:hover {
+  filter: brightness(1.1) !important;
+  transform: translateY(-1px);
+}
+
+/* Custom Logo Sizing Fix */
+img.sidebar-logo-icon {
+  width: 140px !important;
+  height: auto !important;
+  object-fit: contain !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+img.login-logo-icon, img.signup-logo-icon {
+  width: 220px !important;
+  height: auto !important;
+  object-fit: contain !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin: 0 auto 16px auto !important;
+  display: block !important;
+}
+
+/* Force the new logo images to be visible and correctly sized */
+img.sidebar-logo-icon {
+  width: 45px !important;
+  height: 45px !important;
+  object-fit: contain !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  display: inline-block !important;
+}
+img.login-logo-icon, img.signup-logo-icon {
+  width: 140px !important;
+  height: 140px !important;
+  object-fit: contain !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin: 0 auto 16px auto !important;
+  display: block !important;
+}
+
+/* Custom Logo Sizing Fix */
+img.sidebar-logo-icon {
+  width: 40px !important;
+  height: 40px !important;
+  object-fit: contain !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  display: inline-block !important;
+}
+img.login-logo-icon, img.signup-logo-icon {
+  width: 120px !important;
+  height: 120px !important;
+  object-fit: contain !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin: 0 auto 16px auto !important;
+  display: block !important;
+}
+
+/* Force the new logo images to be visible and correctly sized */
+img.sidebar-logo-icon {
+  width: 45px !important;
+  height: 45px !important;
+  object-fit: contain !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  display: inline-block !important;
+}
+img.login-logo-icon, img.signup-logo-icon {
+  width: 140px !important;
+  height: 140px !important;
+  object-fit: contain !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin: 0 auto 16px auto !important;
+  display: block !important;
+}
+
+/* Specific fixes for Dashboard, Login, and Signup logos */
+.sidebar-logo img {
+  width: 40px !important;
+  height: 40px !important;
+  object-fit: contain !important;
+  display: inline-block !important;
+}
+
+.login-logo-icon img,
+.login-logo img,
+img.login-logo-icon {
+  width: 160px !important;
+  height: 160px !important;
+  object-fit: contain !important;
+  display: block !important;
+  margin: 0 auto 16px auto !important;
+  background: transparent !important;
+}
+
+.signup-logo-icon img,
+.signup-logo img,
+img.signup-logo-icon {
+  width: 160px !important;
+  height: 160px !important;
+  object-fit: contain !important;
+  display: block !important;
+  margin: 0 auto 16px auto !important;
+  background: transparent !important;
+}
+
+/* --- BULLETPROOF LOGO FIX --- */
+/* 1. Fix the Dashboard Sidebar Logo */
+.sidebar-logo .sidebar-logo-icon,
+.sidebar-logo img {
+  width: 45px !important;
+  height: 45px !important;
+  min-width: 45px !important;
+  object-fit: contain !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  display: block !important;
+  border-radius: 8px !important;
+}
+
+/* 2. Fix the Login Page Logo */
+.login-logo .login-logo-icon,
+.login-logo img {
+  width: 150px !important;
+  height: 150px !important;
+  object-fit: contain !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin: 0 auto 20px auto !important;
+  display: block !important;
+}
+
+/* 3. Fix the Signup Page Logo */
+.signup-logo .signup-logo-icon,
+.signup-logo img {
+  width: 150px !important;
+  height: 150px !important;
+  object-fit: contain !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin: 0 auto 20px auto !important;
+  display: block !important;
 }

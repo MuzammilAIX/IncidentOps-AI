@@ -1,4 +1,4 @@
-﻿/* IncidentOps-AI — Login page logic */
+/* IncidentOps-AI - Login page logic */
 
 (function() {
   const form = document.getElementById('login-form');
@@ -35,7 +35,7 @@
       try {
         await api.me();
       } catch (probeErr) {
-        // Session didn't stick — retry once more after a longer wait
+        // Session didn't stick - retry once more after a longer wait
         await new Promise(r => setTimeout(r, 500));
         await api.me();
       }

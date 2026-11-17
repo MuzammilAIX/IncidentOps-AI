@@ -1,4 +1,4 @@
-﻿from rest_framework import viewsets, filters, permissions, status
+from rest_framework import viewsets, filters, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -50,19 +50,9 @@ class IncidentViewSet(viewsets.ModelViewSet):
     ordering = ["-created_at"]
 
     def perform_create(self, serializer):
-        """
-        Called by DRF after a successful POST /api/incidents/.
-        Saves the incident, then triggers the AI investigation task
-        in the background via Celery.
-        """
+        """Save the incident. AI investigation is triggered via POST /api/incidents/{id}/investigate/."""
         incident = serializer.save()
-        from apps.incidents.services import trigger_investigation
-        try:
-            trigger_investigation(incident)
-        except Exception:
-            # If Celery/Redis is down, don't fail the API â€” just log it.
-            # The user still gets their 201 Created response.
-            pass
+
     @action(detail=True, methods=["get"], url_path="similar", permission_classes=[AllowAny])
     def similar(self, request, pk=None):
         """Return past incidents similar to this one (same service + keyword overlap)."""
@@ -109,3 +99,11 @@ class IncidentViewSet(viewsets.ModelViewSet):
             "incident": incident.id,
             "similar": results[:3],
         })
+
+    @action(detail=True, methods=["post"], url_path="investigate", permission_classes=[permissions.IsAuthenticated])
+    def investigate(self, request, pk=None):
+        """Trigger AI investigation for this incident."""
+        from apps.incidents.services import trigger_investigation
+        incident = self.get_object()
+        result = trigger_investigation(incident)
+        return Response(result)

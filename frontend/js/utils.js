@@ -1,4 +1,4 @@
-﻿/* IncidentOps-AI Utility Helpers */
+/* IncidentOps-AI Utility Helpers */
 
 function timeAgo(isoString) {
   if (!isoString) return 'N/A';
@@ -46,7 +46,7 @@ function showLoading(element) {
 function showEmpty(element, message) {
   if (element) {
     element.innerHTML = '<div class="empty-state">' +
-      '<div class="empty-state-icon">📭</div>' +
+      '<div class="empty-state-icon"></div>' +
       '<div class="empty-state-title">' + escapeHtml(message || 'Nothing here') + '</div>' +
       '</div>';
   }
@@ -69,7 +69,7 @@ function showToast(message, type) {
 
 function renderIncidentCard(incident) {
   const aiInfo = incident.ai_root_cause
-    ? '<div class="incident-card-ai">🤖 ' + escapeHtml(truncate(incident.ai_root_cause, 100)) + '</div>'
+    ? '<div class="incident-card-ai"> ' + escapeHtml(truncate(incident.ai_root_cause, 100)) + '</div>'
     : '';
   return '<a href="/incident/?id=' + incident.id + '" class="incident-card">' +
     '<div class="incident-card-body">' +
@@ -78,20 +78,20 @@ function renderIncidentCard(incident) {
         severityBadge(incident.severity) +
         statusBadge(incident.status) +
         '<span>' + timeAgo(incident.created_at) + '</span>' +
-        (incident.service_name ? '<span>📦 ' + escapeHtml(incident.service_name) + '</span>' : '') +
+        (incident.service_name ? '<span> ' + escapeHtml(incident.service_name) + '</span>' : '') +
       '</div>' +
       aiInfo +
     '</div>' +
   '</a>';
 }
 
-// ─── URL helpers ───────────────────────────────────────
+//  URL helpers 
 function getQueryParam(name) {
   const params = new URLSearchParams(window.location.search);
   return params.get(name);
 }
 
-// ─── Common helpers ──────────────────────────────────
+//  Common helpers 
 function escapeHtml(s) {
   if (s == null) return '';
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');

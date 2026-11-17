@@ -60,7 +60,7 @@
           '</div>' +
           '<div style="font-size:11px;color:var(--text-muted)">' +
             'Category: ' + escapeHtml(rb.category) +
-            (rb.service_hint ? ' · Service: ' + escapeHtml(rb.service_hint) : '') +
+            (rb.service_hint ? ' - Service: ' + escapeHtml(rb.service_hint) : '') +
           '</div>' +
         '</div>' +
       '</div>' +

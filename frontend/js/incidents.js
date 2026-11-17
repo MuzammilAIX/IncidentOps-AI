@@ -1,4 +1,4 @@
-﻿/* IncidentOps-AI - Incidents list page */
+/* IncidentOps-AI - Incidents list page */
 
 (function() {
   let currentPage = 1;
@@ -18,6 +18,24 @@
       try { await api.logout(); } catch (e) {}
       window.location.href = '/login/';
     });
+
+    // Create incident button
+    document.getElementById('create-incident-btn').addEventListener('click', openCreateModal);
+    document.getElementById('cancel-incident').addEventListener('click', closeCreateModal);
+    document.getElementById('submit-incident').addEventListener('click', submitCreateIncident);
+
+    // Load services for dropdown
+    try {
+      const services = await api.get('/api/services/');
+      const sel = document.getElementById('inc-service');
+      (services.results || []).forEach(function(s) {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = s.name;
+        sel.appendChild(opt);
+      });
+    } catch (e) {}
+
 
     document.getElementById('filter-search').addEventListener('input', debounce(resetAndLoad, 300));
     document.getElementById('filter-severity').addEventListener('change', resetAndLoad);
@@ -96,6 +114,35 @@
       clearTimeout(timer);
       timer = setTimeout(fn, delay);
     };
+  }
+
+
+  function openCreateModal() {
+    document.getElementById('create-incident-modal').style.display = 'flex';
+    document.getElementById('inc-title').focus();
+  }
+  function closeCreateModal() {
+    document.getElementById('create-incident-modal').style.display = 'none';
+    document.getElementById('inc-title').value = '';
+    document.getElementById('inc-description').value = '';
+  }
+  async function submitCreateIncident() {
+    const title = document.getElementById('inc-title').value.trim();
+    if (!title) { showToast('Title is required', 'error'); return; }
+    const data = {
+      title: title,
+      description: document.getElementById('inc-description').value.trim(),
+      severity: document.getElementById('inc-severity').value,
+      service: document.getElementById('inc-service').value || null,
+    };
+    try {
+      await api.post('/api/incidents/', data);
+      showToast('Incident created. Investigation running...', 'success');
+      closeCreateModal();
+      setTimeout(resetAndLoad, 1500);
+    } catch (e) {
+      showToast('Failed: ' + e.message, 'error');
+    }
   }
 
   init();

@@ -64,3 +64,4 @@ __pycache__/
 
 # Screenshots (local only — commit specific ones to docs/screenshots/)
 screenshots-temp/
+!.env.production.example

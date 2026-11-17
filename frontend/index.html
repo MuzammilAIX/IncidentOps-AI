@@ -1,19 +1,19 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard — IncidentOps-AI</title>
-  <link rel="stylesheet" href="/static/css/styles.css">
+  <title>Dashboard - IncidentOps-AI</title>
+  <link rel="stylesheet" href="/static/css/styles.css?v=21">
+  <link rel="icon" type="image/png" href="/static/img/favicon.png">
 </head>
 <body>
   <div class="app">
     <!-- SIDEBAR -->
     <aside class="sidebar">
-      <div class="sidebar-logo">
-        <div class="sidebar-logo-icon">🚨</div>
-        <span>IncidentOps-AI</span>
-      </div>
+      <div class="sidebar-logo" style="display: flex; align-items: center; gap: 10px; padding: 16px;">
+  <img src="/static/img/logo-white.png" style="height: 35px; width: auto; object-fit: contain; background: transparent; border: none; box-shadow: none; mix-blend-mode: screen;">
+</div>
       <nav class="sidebar-nav">
         <a href="/" class="nav-item active">
           <span class="nav-item-icon">📊</span>
@@ -52,22 +52,22 @@
         <div class="card-grid" id="stats">
           <div class="stat-card">
             <div class="stat-label">Active Incidents</div>
-            <div class="stat-value" id="stat-active">—</div>
+            <div class="stat-value" id="stat-active">-</div>
             <div class="stat-trend" id="stat-active-trend"></div>
           </div>
           <div class="stat-card">
             <div class="stat-label">Investigating</div>
-            <div class="stat-value" id="stat-investigating">—</div>
+            <div class="stat-value" id="stat-investigating">-</div>
             <div class="stat-trend" id="stat-investigating-trend"></div>
           </div>
           <div class="stat-card">
             <div class="stat-label">Pending Approvals</div>
-            <div class="stat-value" id="stat-pending">—</div>
+            <div class="stat-value" id="stat-pending">-</div>
             <div class="stat-trend" id="stat-pending-trend"></div>
           </div>
           <div class="stat-card">
             <div class="stat-label">Total Incidents</div>
-            <div class="stat-value" id="stat-total">—</div>
+            <div class="stat-value" id="stat-total">-</div>
             <div class="stat-trend">All time</div>
           </div>
         </div>
@@ -77,7 +77,7 @@
           <div class="card">
             <div class="card-header">
               <h2 class="card-title">Recent Incidents</h2>
-              <a href="/incidents/" class="btn btn-ghost btn-sm">View all →</a>
+              <a href="/incidents/" class="btn btn-ghost btn-sm">View all -></a>
             </div>
             <div id="incidents-list" class="incident-list">
               <div class="loading-overlay"><span class="spinner"></span> Loading incidents...</div>
@@ -87,19 +87,55 @@
           <div class="card">
             <div class="card-header">
               <h2 class="card-title">Pending Approvals</h2>
-              <a href="/approvals/" class="btn btn-ghost btn-sm">View all →</a>
+              <a href="/approvals/" class="btn btn-ghost btn-sm">View all -></a>
             </div>
             <div id="approvals-list">
               <div class="loading-overlay"><span class="spinner"></span> Loading approvals...</div>
             </div>
           </div>
         </div>
-      </main>
+      
+  <div class="card" id="simulate-alert-form" style="margin-bottom:16px;border-left:4px solid #f59e0b">
+    <div class="card-header">
+      <h2 class="card-title">🧪 Simulate Alert</h2>
+      <span class="badge" style="background:rgba(245,158,11,0.15);color:#f59e0b">Demo</span>
+    </div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">Trigger an incident like Prometheus / Grafana / Datadog would. The AI investigates automatically.</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+      <div style="flex:1;min-width:180px">
+        <label style="display:block;font-size:12px;color:var(--text-muted);margin-bottom:4px">Service</label>
+        <select id="sim-service" class="form-select" style="width:100%">
+          <option value="">Unknown</option>
+        </select>
+      </div>
+      <div style="flex:1;min-width:120px">
+        <label style="display:block;font-size:12px;color:var(--text-muted);margin-bottom:4px">Severity</label>
+        <select id="sim-severity" class="form-select" style="width:100%">
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+          <option value="critical">Critical</option>
+        </select>
+      </div>
+      <div style="flex:2;min-width:200px">
+        <label style="display:block;font-size:12px;color:var(--text-muted);margin-bottom:4px">Alert name</label>
+        <input type="text" id="sim-name" class="form-input" placeholder="HighErrorRate" style="width:100%" value="HighErrorRate">
+      </div>
+      <div style="flex:1;min-width:120px">
+        <label style="display:block;font-size:12px;color:var(--text-muted);margin-bottom:4px">&nbsp;</label>
+        <button class="btn btn-primary" id="sim-submit" style="width:100%">Send Alert</button>
+      </div>
+    </div>
+    <div id="sim-result" style="font-size:12px;color:var(--text-muted)"></div>
+  </div>
+
+    </main>
     </div>
   </div>
 
-  <script src="/static/js/api.js?v=12"></script>
-  <script src="/static/js/utils.js?v=12"></script>
-  <script src="/static/js/dashboard.js?v=12"></script>
+  <script src="/static/js/api.js?v=18"></script>
+  <script src="/static/js/utils.js?v=18"></script>
+  <script src="/static/js/dashboard.js?v=18"></script>
+  <script src="/static/js/widget.js?v=26"></script>
 </body>
 </html>

@@ -1,9 +1,48 @@
-﻿/* IncidentOps-AI Dashboard */
+/* IncidentOps-AI Dashboard */
 
 (function() {
   function redirectToLogin() {
     if (!window.location.pathname.startsWith('/login/')) {
       window.location.href = '/login/?next=' + encodeURIComponent(window.location.pathname);
+    }
+  }
+
+
+  async function sendSimulatedAlert() {
+    var service = document.getElementById('sim-service').value;
+    var severity = document.getElementById('sim-severity').value;
+    var name = document.getElementById('sim-name').value.trim() || 'HighErrorRate';
+    var resultEl = document.getElementById('sim-result');
+    var btn = document.getElementById('sim-submit');
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+    resultEl.textContent = '';
+    try {
+      var resp = await fetch('/api/monitoring/webhooks/generic/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') || '' },
+          credentials: 'include',
+        body: JSON.stringify({
+          service: service,
+          severity: severity,
+          name: name,
+          description: 'Simulated alert from dashboard',
+          type: 'simulated_alert'
+        })
+      });
+      var data = await resp.json();
+      if (resp.ok) {
+        resultEl.innerHTML = '<span style="color:#10b981">\u2705 Incident #' + data.incident_id + ' created' + (data.investigation_triggered ? ', investigation queued' : '') + '</span>';
+        showToast('Alert sent. Investigation running...', 'success');
+        setTimeout(refresh, 3000);
+      } else {
+        throw new Error(data.error || 'Failed');
+      }
+    } catch (e) {
+      resultEl.innerHTML = '<span style="color:#ef4444">\u274C ' + e.message + '</span>';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Send Alert';
     }
   }
 
@@ -24,6 +63,20 @@
       try { await api.logout(); } catch (e) { /* ignore */ }
       window.location.href = '/login/';
     });
+
+    // Simulate alert handler
+    var simBtn = document.getElementById('sim-submit');
+    if (simBtn) {
+      simBtn.addEventListener('click', sendSimulatedAlert);
+      // Load services for dropdown (hardcoded since /api/services/ may not exist)
+      const sel = document.getElementById('sim-service');
+      ['payment-service', 'api-gateway', 'auth-service', 'notification-worker'].forEach(function(name) {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        sel.appendChild(opt);
+      });
+    }
 
     await refresh();
     setInterval(refresh, 10000);
