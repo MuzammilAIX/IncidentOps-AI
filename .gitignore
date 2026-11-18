@@ -45,7 +45,7 @@ node_modules/
 uv.lock
 .env
 
-# Secrets — never commit
+# Secrets ï¿½ never commit
 .env
 .env.*
 !.env.example
@@ -62,6 +62,8 @@ celerybeat-schedule*
 __pycache__/
 *.pyc
 
-# Screenshots (local only — commit specific ones to docs/screenshots/)
+# Screenshots (local only ï¿½ commit specific ones to docs/screenshots/)
 screenshots-temp/
 !.env.production.example
+.vercel
+.env*
