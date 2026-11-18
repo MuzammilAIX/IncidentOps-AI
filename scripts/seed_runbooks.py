@@ -1,9 +1,5 @@
+﻿
 """Seed realistic runbooks matching the demo incidents."""
-import os, sys, django
-from pathlib import Path
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.development")
-django.setup()
 from apps.monitoring.models import Runbook
 
 
