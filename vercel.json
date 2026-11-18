@@ -1,9 +1,10 @@
-{
+﻿{
   "version": 2,
   "builds": [
     {
-      "src": "incidentops/wsgi.py",
-      "use": "@vercel/python"
+      "src": "config/wsgi.py",
+      "use": "@vercel/python",
+      "config": { "maxLambdaSize": "50mb" }
     }
   ],
   "routes": [
@@ -13,7 +14,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "incidentops/wsgi.py"
+      "dest": "config/wsgi.py"
     }
   ]
 }

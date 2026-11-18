@@ -1,4 +1,4 @@
-#!/bin/bash
+﻿#!/bin/bash
 echo "BUILD START"
 python3.12 -m pip install uv
 uv sync --no-dev
